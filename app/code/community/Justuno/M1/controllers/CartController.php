@@ -5,11 +5,10 @@ use Justuno_M1_Response as R;
 use Mage_Catalog_Model_Product as P;
 use Mage_Checkout_Model_Cart as Cart;
 use Mage_Checkout_Model_Session as Sess;
-# 2020-01-20
+# 2020-01-20 "Implement the «add a configurable product to the cart» endpoint": https://github.com/justuno-com/m1/issues/38
 final class Justuno_M1_CartController extends Mage_Core_Controller_Front_Action {
 	/**
 	 * 2020-01-20
-	 * 1) "Implement the «add a configurable product to the cart» endpoint": https://github.com/justuno-com/m1/issues/38
 	 * @see Mage_Checkout_CartController::addAction():
 	 * https://github.com/OpenMage/magento-mirror/blob/1.9.4.3/app/code/core/Mage/Checkout/controllers/CartController.php#L203-L280
 	 */
@@ -24,7 +23,7 @@ final class Justuno_M1_CartController extends Mage_Core_Controller_Front_Action 
 		if ($p->isConfigurable()) {
 			$ch = self::product('variant'); /** @var P $ch */
 			$sa = []; /** @var array(int => int) $sa */
-			foreach ($p->getTypeInstance(true)->getConfigurableAttributesAsArray($p) as $a) {
+			foreach (L::productTI($p)->getConfigurableAttributesAsArray($p) as $a) {
 				/** @var array(string => mixed) $a */
 				$sa[(int)$a['attribute_id']] = $ch[$a['attribute_code']];
 			}
@@ -43,7 +42,10 @@ final class Justuno_M1_CartController extends Mage_Core_Controller_Front_Action 
 		Mage::dispatchEvent('checkout_cart_add_product_complete', [
 			'product' => $p, 'request' => $this->getRequest(), 'response' => $this->getResponse()
 		]);
-	});}
+	# 2020-02-06
+	# "`justuno/cart/add` should not require the Justuno token (Magento customer authentication is enough)":
+	# https://github.com/justuno-com/m1/issues/40
+	}, false);}
 
 	/**
 	 * 2020-01-21

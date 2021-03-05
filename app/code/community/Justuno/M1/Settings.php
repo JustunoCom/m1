@@ -24,17 +24,9 @@ final class Justuno_M1_Settings {
 
 	/**
 	 * 2020-01-15
-	 * @used-by Justuno_M1_Response::authorize()
-	 * @return string
-	 */
-	static function token() {return self::v('jutoken');}
-
-	/**
-	 * 2020-01-15
 	 * @used-by ajaxUrl()
 	 * @used-by brand()
 	 * @used-by id()
-	 * @used-by token()
 	 * @param string $k
 	 * @return string
 	 */

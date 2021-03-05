@@ -8,6 +8,7 @@ final class Justuno_M1_DB {
 	 * 2019-11-07
 	 * @used-by select()
 	 * @used-by Justuno_M1_Orders::stat()
+	 * @used-by Justuno_M1_Response::store()
 	 * @used-by app/code/community/Justuno/M1/sql/Justuno_M1/mysql4-install-1.4.3.php
 	 * @return MySQL
 	 */
@@ -16,6 +17,7 @@ final class Justuno_M1_DB {
 	/**
 	 * 2019-11-07
 	 * @used-by Justuno_M1_Orders::stat()
+	 * @used-by Justuno_M1_Response::store()
 	 * @return Select
 	 */
 	static function select() {return self::conn()->select();}
@@ -23,6 +25,7 @@ final class Justuno_M1_DB {
 	/**
 	 * 2019-11-07
 	 * @used-by Justuno_M1_Orders::stat()
+	 * @used-by Justuno_M1_Response::store()
 	 * @used-by app/code/community/Justuno/M1/sql/Justuno_M1/mysql4-install-1.4.3.php
 	 * @param string $s
 	 * @return string

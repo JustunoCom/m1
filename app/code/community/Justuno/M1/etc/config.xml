@@ -4,7 +4,7 @@
 		<Justuno_M1>
 			<author>Dmitry Fedyuk</author>
 			<url>https://www.upwork.com/fl/mage2pro</url>
-			<version>1.6.2</version>
+			<version>1.6.6</version>
 		</Justuno_M1>
 	</modules>
 	<frontend>
@@ -45,6 +45,16 @@ and it's still false and shows the actual inventory»: https://github.com/justun
 		</routers>
 	</frontend>
 	<global>
+		<helpers>
+			<catalog>
+				<rewrite>
+<!-- 2020-11-27
+"Disable the «Use Flat Catalog Product» option for the `jumagext/response/catalog` request":
+https://github.com/justuno-com/m1/issues/50 -->
+					<product_flat>Justuno_M1_Rewrite_Catalog_Helper_Product_Flat</product_flat>
+				</rewrite>
+			</catalog>
+		</helpers>
 <!-- 2019-11-26
 @used-by Mage_Log_Model_Visitor::isModuleIgnored()
 https://github.com/OpenMage/magento-mirror/blob/1.9.4.3/app/code/core/Mage/Log/Model/Visitor.php#L333-L344 -->

@@ -1,6 +1,11 @@
 <?php
+use Exception as E;
+use Justuno_M1_DB as DB;
 use Justuno_M1_Lib as L;
-use Justuno_M1_Settings as S;
+use Mage_Adminhtml_Block_System_Config_Form as F;
+use Mage_Core_Model_App as App;
+use Mage_Core_Model_Store as S;
+use Varien_Db_Select as Sel;
 # 2019-10-30
 final class Justuno_M1_Response {
 	/**
@@ -12,14 +17,8 @@ final class Justuno_M1_Response {
 	 * @param \Closure $f
 	 * @param bool $auth [optional]
 	 */
-	static function p(\Closure $f, $auth = false) {/** @var array(string => mixed) $r */
-		try {
-			# 2020-02-06
-			# "`justuno/cart/add` should not require the Justuno token (Magento customer authentication is enough)":
-			# https://github.com/justuno-com/m1/issues/40
-			!$auth || self::authorize();
-			$r = $f();
-		}
+	static function p(\Closure $f, $auth = true) {/** @var array(string => mixed) $r */
+		try {$r = !$auth ? $f() : $f(self::store());}
 		catch (\Exception $e) {$r = ['message' => $e->getMessage()];}
 		self::res($r);
 	}
@@ -31,21 +30,6 @@ final class Justuno_M1_Response {
 	 * @return string
 	 */
 	static function url($path) {return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB, true) . $path;}
-
-	/**
-	 * 2019-10-27
-	 * @used-by p()
-	 */
-	private static function authorize() {
-		if (!isset($_SERVER['DF_DEVELOPER'])) {
-			if (!($t = Mage::app()->getRequest()->getHeader('Authorization'))) {
-				die('Token missing!');
-			}
-			if ($t !== S::token()) {
-				die('Token mismatched!');
-			}
-		}
-	}
 
 	/**
 	 * 2019-10-30
@@ -74,5 +58,36 @@ final class Justuno_M1_Response {
 		$r = Mage::app()->getResponse(); /** @var Zend_Controller_Response_Http $r */
 		$r->clearHeaders()->setHeader('Content-type','application/json', true);
 		$r->setBody(L::json_encode(is_null($v) ? 'OK' : (!is_array($v) ? $v : self::filter($v))));
+	}
+
+	/**
+	 * 2021-01-29 "Make the module multi-store aware": https://github.com/justuno-com/m1/issues/51
+	 * @used-by p()
+	 * @return S
+	 * @throws E
+	 */
+	private static function store() {/** @var S $r */
+		$app = Mage::app(); /** @var App $app */
+		if (!($token = $app->getRequest()->getHeader('Authorization'))) { /** @var string|null $token */
+			$r = isset($_SERVER['DF_DEVELOPER']) ? $app->getStore() : L::error('Please provide a valid token key');
+		}
+		else {
+			$sel = DB::select()->from(DB::t('core_config_data'), ['scope', 'scope_id']); /** @var Sel $sel */
+			$sel->where('? = path', 'justuno/justuno_settings/jutoken');
+			$sel->where('? = value', $token);
+			$w = function(array $a) {return L::tr(L::a($a, 'scope'), array_flip([
+				F::SCOPE_STORES, F::SCOPE_WEBSITES, F::SCOPE_DEFAULT
+			]));};
+			/** @var array(string => string) $row */
+			$row = L::first(L::sort(DB::conn()->fetchAll($sel), function(array $a, array $b) use($w) {return $w($a) - $w($b);}));
+			L::assert($row, "The token $token is not registered in Magento.");
+			$scope = L::a($row, 'scope'); /** @var string $scope */
+			$scopeId = L::a($row, 'scope_id'); /** @var string $scopeId */
+			$r = F::SCOPE_STORES === $scope ? $app->getStore($scopeId) : (
+				F::SCOPE_DEFAULT === $scope ? $app->getStore() :
+					$app->getWebsite($scopeId)->getDefaultStore()
+			);
+		}
+		return $r;
 	}
 }

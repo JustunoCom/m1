@@ -1,6 +1,6 @@
 <?php
-// 2020-01-15 This block is never cached:
-// https://github.com/justuno-com/m1/blob/1.4.4/app/design/frontend/base/default/layout/justuno/m1.xml#L5-L20
+# 2020-01-15 This block is never cached:
+# https://github.com/justuno-com/m1/blob/1.4.4/app/design/frontend/base/default/layout/justuno/m1.xml#L5-L20
 use Justuno_M1_Lib as L;
 use Justuno_M1_Settings as S;
 use Mage_Catalog_Model_Product as P;
@@ -10,9 +10,9 @@ use Mage_Customer_Model_Session as SCustomer;
 use Mage_Sales_Model_Order as O;
 use Mage_Sales_Model_Quote as Q;
 $app = Mage::app(); /** @var App $app */
-// 2020-01-15 «How to get Magento customer ID» https://stackoverflow.com/a/17236128
+# 2020-01-15 «How to get Magento customer ID» https://stackoverflow.com/a/17236128
 $sCustomer = Mage::getSingleton('customer/session'); /** @var SCustomer $sCustomer */
-// 2020-01-15 «Get product stock quantity in magento» https://magento.stackexchange.com/a/209505
+# 2020-01-15 «Get product stock quantity in magento» https://magento.stackexchange.com/a/209505
 list($pid, $qty) = ($p = Mage::registry('current_product')) /** @var P|null $p */
 	? [(int)$p->getId(), (int)$p->getStockItem()->getQty()] : [null, null]
 ; /** @var int|null $pid */  /** @var int|null $qty */

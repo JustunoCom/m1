@@ -3,6 +3,7 @@ use Justuno_M1_DB as DB;
 use Justuno_M1_Filter as Filter;
 use Justuno_M1_OI as OIH;
 use Justuno_M1_Response as R;
+use Mage_Core_Model_Store as S;
 use Mage_Customer_Model_Customer as C;
 use Mage_Sales_Model_Order as O;
 use Mage_Sales_Model_Order_Address as A;
@@ -14,23 +15,19 @@ final class Justuno_M1_Orders {
 	 * 2019-10-31
 	 * @used-by Justuno_M1_ResponseController::ordersAction()
 	 */
-	static function p() {R::p(function() {return array_values(array_map(function(O $o) {return [
+	static function p() {R::p(function(S $s) {return array_values(array_map(function(O $o) {return [
 		'CountryCode' => $o->getBillingAddress()->getCountryId()
 		,'CreatedAt' => $o->getCreatedAt()
 		,'Currency' => $o->getOrderCurrencyCode()
-		/**
-		 * 2019-10-31
-		 * Orders: «if the customer checked out as a guest
-		 * we need still need a Customer object and it needs the ID to be a randomly generated UUID
-		 * or other random string»: https://github.com/justuno-com/m1/issues/30
-		 */
+		# 2019-10-31
+		# Orders: «if the customer checked out as a guest
+		# we need still need a Customer object and it needs the ID to be a randomly generated UUID
+		# or other random string»: https://github.com/justuno-com/m1/issues/30
 		,'Customer' => self::customer($o)
-		/**
-		 * 2019-10-31
-		 * Orders: «if the customer checked out as a guest
-		 * we need still need a Customer object and it needs the ID to be a randomly generated UUID
-		 * or other random string»: https://github.com/justuno-com/m1/issues/30
-		 */
+		# 2019-10-31
+		# Orders: «if the customer checked out as a guest
+		# we need still need a Customer object and it needs the ID to be a randomly generated UUID
+		# or other random string»: https://github.com/justuno-com/m1/issues/30
 		,'CustomerId' => $o->getCustomerId() ?: $o->getCustomerEmail()
 		,'Email' => $o->getCustomerEmail()
 		,'ID' => $o->getIncrementId()
@@ -44,8 +41,7 @@ final class Justuno_M1_Orders {
 			,'ProductId' => OIH::top($i)->getProductId()
 			,'TotalDiscount' => (float)OIH::top($i)->getDiscountAmount()
 			# 2019-10-31
-			# Orders: «VariantID for lineItems is currently hardcoded as ''»:
-			# https://github.com/justuno-com/m1/issues/29
+			# Orders: «VariantID for lineItems is currently hardcoded as ''»: https://github.com/justuno-com/m1/issues/29
 			,'VariantId' => $i->getProductId()
 		];}, array_filter($o->getAllItems(), function(OI $i) {return !$i->getChildrenItems();})))
 		,'OrderNumber' => $o->getId()
@@ -57,7 +53,8 @@ final class Justuno_M1_Orders {
 		,'TotalPrice' => (float)$o->getGrandTotal()
 		,'TotalTax' => (float)$o->getTaxAmount()
 		,'UpdatedAt' => $o->getUpdatedAt()
-	];}, Filter::p(new OC)->getItems()));}, true);}
+	# 2021-01-30 "Make the module multi-store aware": https://github.com/justuno-com/m1/issues/51
+	];}, Filter::p(new OC)->addFieldToFilter('store_id', $s->getId())->getItems()));});}
 
 	/**
 	 * 2019-10-27
@@ -83,12 +80,10 @@ final class Justuno_M1_Orders {
 			,'CreatedAt' => $c['created_at']
 			,'Email' => $o->getCustomerEmail()
 			,'FirstName' => $o->getCustomerFirstname()
-			/**
-			 * 2019-10-31
-			 * Orders: «if the customer checked out as a guest
-			 * we need still need a Customer object and it needs the ID to be a randomly generated UUID
-			 * or other random string»: https://github.com/justuno-com/m1/issues/30
-			 */
+			# 2019-10-31
+			# Orders: «if the customer checked out as a guest
+			# we need still need a Customer object and it needs the ID to be a randomly generated UUID
+			# or other random string»: https://github.com/justuno-com/m1/issues/30
 			,'ID' => $o->getCustomerId() ?: $o->getCustomerEmail()
 			,'LastName' => $o->getCustomerLastname()
 			,'OrdersCount' => (int)self::stat($o, 'COUNT(*)')
@@ -103,8 +98,7 @@ final class Justuno_M1_Orders {
 	/**
 	 * 2019-11-07
 	 * 2019-11-07
-	 * 1) «Allowed memory size exausted» on `'OrdersCount' => $oc->count()`:
-	 * https://github.com/justuno-com/m1/issues/36
+	 * 1) «Allowed memory size exausted» on `'OrdersCount' => $oc->count()`: https://github.com/justuno-com/m1/issues/36
 	 * 2) I have replaced the customer collection with direct SQL queries.
 	 * @used-by ordersCount()
 	 * @used-by totalSpent()
@@ -114,8 +108,6 @@ final class Justuno_M1_Orders {
 	 */
 	private static function stat(O $o, $v) {
 		$k = $o->getCustomerId() ? 'customer_id' : 'customer_email'; /** @var string $k */
-		return DB::conn()->fetchOne(
-			DB::select()->from(DB::t('sales_flat_order'), ['v' => $v])->where("? = $k", $o[$k])
-		);
+		return DB::conn()->fetchOne(DB::select()->from(DB::t('sales_flat_order'), ['v' => $v])->where("? = $k", $o[$k]));
 	}
 }

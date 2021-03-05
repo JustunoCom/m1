@@ -1,6 +1,5 @@
 // 2020-03-14
-// "Respond to the `/justuno/service-worker.js` request with the provided JavaScript":
-// https://github.com/justuno-com/m1/issues/42
+// "Respond to the `/justuno/service-worker.js` request with the provided JavaScript": https://github.com/justuno-com/m1/issues/42
 self.addEventListener('push', function (event) {
 	console.log('Push message!', event.data.text());
 	const payload = JSON.parse(event.data.text());

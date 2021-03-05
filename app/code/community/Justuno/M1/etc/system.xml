@@ -18,9 +18,9 @@
 					<sort_order>10</sort_order>
 					<fields>
 						<accid>
-							<comment>ACCID is found in the admin settings of your Justuno account in your embed section (XXXXXXXX-XXXX-XXXX-XXXXXXX)</comment>
+							<comment><![CDATA[<a href='https://github.com/justuno-com/m1#account-number' target='_blank'>where to find it?</a>]]></comment>
 							<frontend_type>text</frontend_type>
-							<label>ACCID (Unique Justuno ACCOUNT ID)</label>
+							<label>Justuno Account Number</label>
 							<show_in_default>1</show_in_default>
 							<show_in_store>1</show_in_store>
 							<show_in_website>1</show_in_website>
@@ -28,7 +28,7 @@
 						</accid>
 						<brand_attributure translate='label'>
 							<frontend_type>select</frontend_type>
-							<label>Choose Brand Attribute </label>
+							<label>Brand Attribute </label>
 							<show_in_default>1</show_in_default>
 							<show_in_store>1</show_in_store>
 							<show_in_website>1</show_in_website>
