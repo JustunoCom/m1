@@ -61,24 +61,23 @@ final class Justuno_M1_Catalog_Variants {
 			 * https://github.com/justuno-com/m1/issues/35
 			 */
 			,'InventoryQuantity' => $p->isDisabled() || ($parent && $parent->isDisabled()) ? -9999 : (int)$si->getQty()
-			/**
-			 * 2019-10-30
-			 * 1) «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
-			 * or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
-			 * 2) «MSRP was null for some variants but the MSRP wasn't null for the parent»:
-			 * https://github.com/justuno-com/m1/issues/7
-			 * 3) «If their isn't an MSRP for some reason just use the salesprice»:
-			 * https://github.com/justuno-com/m1/issues/6
-			 * 2019-10-31
-			 * «For variant pricing,
-			 * i would want the flow to be the same as the MSRP and SalePrice from the parent above
-			 * but using the variant's pricing of course»: https://github.com/justuno-com/m1/issues/25
-			 */
-			,'MSRP' => (float)($p['msrp'] ?: ($p['price'] ?: $p->getPrice()))
+			# 2019-10-30
+			# 1) «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
+			# or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
+			# 2) «MSRP was null for some variants but the MSRP wasn't null for the parent»:
+			# https://github.com/justuno-com/m1/issues/7
+			# 3) «If their isn't an MSRP for some reason just use the salesprice»: https://github.com/justuno-com/m1/issues/6
+			# 2019-10-31
+			# «For variant pricing,
+			# i would want the flow to be the same as the MSRP and SalePrice from the parent above
+			# but using the variant's pricing of course»: https://github.com/justuno-com/m1/issues/25
+			# 2021-03-24 "Replace `getPrice` with `getFinalPrice`": https://github.com/justuno-com/m1/issues/54
+			,'MSRP' => (float)($p['msrp'] ?: ($p['price'] ?: $p->getFinalPrice()))
 			# 2019-10-30
 			# «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
 			# or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
-			,'SalePrice' => (float)$p->getPrice()
+			# 2021-03-24 "Replace `getPrice` with `getFinalPrice`": https://github.com/justuno-com/m1/issues/54
+			,'SalePrice' => (float)$p->getFinalPrice()
 			,'SKU' => $p->getSku()
 			,'Title' => $p->getName()
 		];

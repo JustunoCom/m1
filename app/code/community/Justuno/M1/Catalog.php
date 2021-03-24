@@ -71,25 +71,21 @@ final class Justuno_M1_Catalog {
 				# «The parent ID is pulling the sku, it should be pulling the ID like the variant does»:
 				# https://github.com/justuno-com/m1/issues/19
 				,'ID' => $p->getId()
-				/**
-				 * 2019-10-30
-				 * 1) «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
-				 * or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
-				 * 2) «If their isn't an MSRP for some reason just use the salesprice»:
-				 * https://github.com/justuno-com/m1/issues/6
-				 * 2019-10-31
-				 * «The MSRP should pull in this order MSRP > Price > Dynamic Price»:
-				 * https://github.com/justuno-com/m1/issues/20
-				 */
-				,'MSRP' => (float)($p['msrp'] ?: ($p['price'] ?: $p->getPrice()))
-				 /**
-				  * 2019-10-30
-				  * «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
-				  * or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
-				  * 2019-10-31
-				  * «Price should be Price > Dynamic Price»: https://github.com/justuno-com/m1/issues/21
-				  */
-				,'Price' => (float)($p['price'] ?: $p->getPrice())
+				# 2019-10-30
+				# 1) «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
+				# or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
+				# 2) «If their isn't an MSRP for some reason just use the salesprice»:
+				# https://github.com/justuno-com/m1/issues/6
+				# 2019-10-31
+				# «The MSRP should pull in this order MSRP > Price > Dynamic Price»: https://github.com/justuno-com/m1/issues/20
+				# 2021-03-24 "Replace `getPrice` with `getFinalPrice`": https://github.com/justuno-com/m1/issues/54
+				,'MSRP' => (float)($p['msrp'] ?: ($p['price'] ?: $p->getFinalPrice()))
+				# 2019-10-30
+				# «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
+				# or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
+				# 2019-10-31 «Price should be Price > Dynamic Price»: https://github.com/justuno-com/m1/issues/21
+				# 2021-03-24 "Replace `getPrice` with `getFinalPrice`": https://github.com/justuno-com/m1/issues/54
+				,'Price' => (float)($p['price'] ?: $p->getFinalPrice())
 				# 2019-10-30 «ReviewsCount and ReviewSums need to be Ints»: https://github.com/justuno-com/m1/issues/11
 				,'ReviewsCount' => (int)$rs->getReviewsCount()
 				# 2019-10-30
@@ -100,7 +96,8 @@ final class Justuno_M1_Catalog {
 				# 2019-10-30
 				# «MSRP, Price, SalePrice, Variants.MSRP, and Variants.SalePrice all need to be Floats,
 				# or if that is not possible then Ints»: https://github.com/justuno-com/m1/issues/10
-				,'SalePrice' => (float)$p->getPrice()
+				# 2021-03-24 "Replace `getPrice` with `getFinalPrice`": https://github.com/justuno-com/m1/issues/54
+				,'SalePrice' => (float)$p->getFinalPrice()
 				,'Tags' => self::tags($p)
 				,'Title' => $p['name']
 				,'UpdatedAt' => $p['updated_at']
